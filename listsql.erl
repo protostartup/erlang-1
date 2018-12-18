@@ -1,11 +1,20 @@
 -module(listsql).
--export([test/0]).
+-author("B. Angelo Molizane").
+-version("1.0").
+%-compile(export_all).
+-export([test/0, test/3]).
 -export([list/1]).
+%-import(string, [concat/2]).
 
 test() ->
-    {ok, Ref} = odbc:connect("Driver=SQL Server Native Client 11.0;Server=<server>;Port=3306;Database=<database>;Trusted_Connection=yes", [])
+    test(<server>, <database>, <sql>)
+    .
+
+test(Server, Database, SQL) ->
+    {ok, Ref} = odbc:connect("Driver=SQL Server Native Client 11.0;Server=" ++ Server ++ ";Port=3306;Database=" ++ Database ++ ";Trusted_Connection=yes", [])
+    %%{ok, Ref} = odbc:connect(string:concat(string:concat(string:concat(string:concat("Driver=SQL Server Native Client 11.0;Server=", Server), ";Port=3306;Database="), Database), ";Trusted_Connection=yes"), [])
     ,
-    odbc:select_count(Ref, "SELECT * FROM <table> WHERE <cond1> AND <cond2> AND <cond3> ORDER BY <fields>")
+    odbc:select_count(Ref, SQL)
     ,
     list(Ref)
     .
