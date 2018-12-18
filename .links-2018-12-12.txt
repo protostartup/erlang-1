@@ -1,0 +1,10 @@
+http://erlang.org/documentation/
+http://erlang.org/doc/apps/odbc/
+http://erlang-odbc-tips.colefichter.ca/
+https://github.com/erlang/otp/tree/master/lib/odbc
+http://erlang-odbc-tips.colefichter.ca/
+https://www.scss.tcd.ie/~htewari/4D1/erlang/lib/odbc-0.9.4/doc/html/OdbcExamples.html
+https://www.tutorialspoint.com/erlang/erlang_numbers.htm
+https://learnyousomeerlang.com/content
+
+https://elixirschool.com/pt/
