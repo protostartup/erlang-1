@@ -4,10 +4,19 @@
 %-compile(export_all).
 -export([test/0, test/3]).
 -export([list/1]).
-%-import(string, [concat/2]).
+-import(string, [concat/2, to_float/1]).
+-import(realnum, [is_realnumber/1]).
+
+%test() ->
+%    {ok, Ref} = odbc:connect("Driver=SQL Server Native Client 11.0;Server=SRV911;Port=3306;Database=DB_WSCalculo;Trusted_Connection=yes", [])
+%    ,
+%    odbc:select_count(Ref, "SELECT * FROM estudos WHERE cd_produto = 3101 AND cd_versao = 20180901 AND ativo3101p3104 = 1 ORDER BY cd_estudo")
+%    ,
+%    list(Ref)
+%    .
 
 test() ->
-    test(<server>, <database>, <sql>)
+    test("SRV911", "DB_WSCalculo", "SELECT * FROM estudos WHERE cd_produto = 3101 AND cd_versao = 20180901 AND ativo3101p3104 = 1 ORDER BY cd_estudo")
     .
 
 test(Server, Database, SQL) ->
@@ -44,7 +53,7 @@ header(Fields) ->
 %    io:format("The time tuple (~p) indicates: ~p:~p:~p.~n", [Time,H,Min,S]);
 %valid_time(_) ->
 %    io:format("Stop feeding me wrong data!~n").
-    
+
 %fielddata({Date = {Year, Month, Day}, Time = {Hour, Minute, Seconds}}) ->
 fielddata({{Year, Month, Day}, {0, 0, 0}}) ->
     io:fwrite("~2..0B/~2..0B/~4..0B", [Day, Month, Year]);
@@ -53,23 +62,43 @@ fielddata({{Year, Month, Day}, {Hour, Minute, Seconds}}) ->
 fielddata(X) when is_integer(X); is_boolean(X) ->
     io:fwrite("~w", [X]);
 fielddata(X) when is_float(X) ->
-    io:fwrite("~f", [X]);
+    %io:fwrite("~f", [X]);
+    A = string:replace(io_lib:format("~f", [X]), ".", ",")
+    ,
+    io:fwrite("~s", [A]);
 fielddata(null) ->
     io:fwrite("NULL");
 fielddata(X) ->
-    io:fwrite("\"~s\"", [X])
+    case is_realnumber(X) of
+         true -> [B | _] = X
+                 ,
+                 if B == 46 -> {A, _} = string:to_float("0" ++ X); % "."
+                       true -> {A, _} = string:to_float(X)
+                 end
+                 ,
+                 C = string:replace(io_lib:format("~f", [A]), ".", ",")
+                 ,
+                 io:fwrite("~s", [C]);
+        false -> io:fwrite("\"~s\"", [X])
+    end
     .
 
+eachfield([]) -> io:fwrite("\r\n");
 eachfield(Row) ->
     [A | B] = Row
     ,
     fielddata(A)
     ,
-    if B =/= [] -> io:fwrite("\t"), eachfield(B);
-           true -> io:fwrite("\r\n")
-    end
+    io:fwrite("\r\n")
+    ,
+    %if B =/= [] ->
+    eachfield(B)
+    %;
+    %       true -> io:fwrite("\r\n")
+    %end
     .
 
+eachrow([], _) -> io:fwrite("\r\n");
 eachrow(Row, Ref) ->
     [A | _] = Row
     ,
@@ -77,7 +106,9 @@ eachrow(Row, Ref) ->
     ,
     {selected, _, Rw} = odbc:next(Ref)
     ,
-    if Rw =/= [] -> eachrow(Rw, Ref);
-            true -> io:fwrite("\r\n")
-    end
+    %if Rw =/= [] ->
+    eachrow(Rw, Ref)
+    %;
+    %        true -> io:fwrite("\r\n")
+    %end
     .
