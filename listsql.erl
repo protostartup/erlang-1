@@ -8,15 +8,15 @@
 -import(realnum, [is_realnumber/1]).
 
 %test() ->
-%    {ok, Ref} = odbc:connect("Driver=SQL Server Native Client 11.0;Server=SRV911;Port=3306;Database=DB_WSCalculo;Trusted_Connection=yes", [])
+%    {ok, Ref} = odbc:connect("Driver=SQL Server Native Client 11.0;Server=<server>;Port=3306;Database=<database>;Trusted_Connection=yes", [])
 %    ,
-%    odbc:select_count(Ref, "SELECT * FROM estudos WHERE cd_produto = 3101 AND cd_versao = 20180901 AND ativo3101p3104 = 1 ORDER BY cd_estudo")
+%    odbc:select_count(Ref, "SELECT * FROM <table> WHERE <conditions> ORDER BY <fields>")
 %    ,
 %    list(Ref)
 %    .
 
 test() ->
-    test("SRV911", "DB_WSCalculo", "SELECT * FROM estudos WHERE cd_produto = 3101 AND cd_versao = 20180901 AND ativo3101p3104 = 1 ORDER BY cd_estudo")
+    test("<server>", "<database>", "SELECT * FROM <table> WHERE <conditions> ORDER BY <fields>")
     .
 
 test(Server, Database, SQL) ->
